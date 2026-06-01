@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statistics Solver</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <h1>📊 Statistics Solver</h1>
+
+    <p class="subtitle">
+      Solve Mean, Mean Deviation, Variance & Standard Deviation
+    </p>
+
+    <textarea
+      id="numbers"
+      placeholder="Enter numbers separated by commas...
+Example: 2,4,6,8,10">
+    </textarea>
+
+    <div class="buttons">
+      <button onclick="solveAll()">Solve</button>
+      <button onclick="clearData()">Clear</button>
+    </div>
+
+    <div class="result" id="result">
+      Results will appear here...
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
