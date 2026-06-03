@@ -1,40 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Statistics Solver</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistics Solver</title>
 
-  <link rel="stylesheet" href="style.css">
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f5f5f5;
+    padding:20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+textarea{
+    width:100%;
+    height:120px;
+    padding:10px;
+    margin-bottom:15px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:15px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#007bff;
+    color:white;
+    border:none;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#007bff;
+    color:white;
+}
+
+.result{
+    margin-top:20px;
+    font-size:18px;
+}
+
+.result p{
+    margin:10px 0;
+}
+</style>
 </head>
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>📊 Statistics Solver</h1>
+<h1>Statistics Solver</h1>
 
-    <p class="subtitle">
-      Solve Mean, Mean Deviation, Variance & Standard Deviation
-    </p>
+<textarea id="data"
+placeholder="Enter scores separated by commas"></textarea>
 
-    <textarea
-      id="numbers"
-      placeholder="Enter numbers separated by commas...
-Example: 2,4,6,8,10">
-    </textarea>
+<input type="number"
+id="passMark"
+placeholder="Enter pass mark">
 
-    <div class="buttons">
-      <button onclick="solveAll()">Solve</button>
-      <button onclick="clearData()">Clear</button>
-    </div>
+<button onclick="solve()">Solve</button>
 
-    <div class="result" id="result">
-      Results will appear here...
-    </div>
+<div id="tableOutput"></div>
 
-  </div>
+<div class="result" id="results"></div>
 
-  <script src="script.js"></script>
+</div>
+
+<script>
+function solve(){
+
+let raw=document.getElementById("data").value;
+
+let scores=raw
+.split(",")
+.map(x=>Number(x.trim()))
+.filter(x=>!isNaN(x));
+
+if(scores.length===0){
+    alert("Enter valid scores");
+    return;
+}
+
+let passMark=Number(document.getElementById("passMark").value);
+
+let min=Math.min(...scores);
+let max=Math.max(...scores);
+
+let start=Math.floor(min/3)*3+1;
+
+while(start>min){
+    start-=3;
+}
+
+let intervals=[];
+let frequencies=[];
+
+for(let lower=start; lower<=max; lower+=3){
+
+    let upper=lower+2;
+
+    intervals.push([lower,upper]);
+
+    let freq=scores.filter(
+        x=>x>=lower && x<=upper
+    ).length;
+
+    frequencies.push(freq);
+}
+
+let table=`
+<table>
+<tr>
+<th>Class Interval</th>
+<th>Frequency</th>
+<th>Midpoint</th>
+<th>fx</th>
+<th>fx²</th>
+</tr>
+`;
+
+let totalF=0;
+let totalFX=0;
+let totalFX2=0;
+
+for(let i=0;i<intervals.length;i++){
+
+    let lower=intervals[i][0];
+    let upper=intervals[i][1];
+
+    let f=frequencies[i];
+
+    let midpoint=(lower+upper)/2;
+
+    let fx=f*midpoint;
+    let fx2=f*(midpoint**2);
+
+    totalF+=f;
+    totalFX+=fx;
+    totalFX2+=fx2;
+
+    table+=`
+    <tr>
+    <td>${lower}-${upper}</td>
+    <td>${f}</td>
+    <td>${midpoint}</td>
+    <td>${fx}</td>
+    <td>${fx2}</td>
+    </tr>
+    `;
+}
+
+table+=`
+<tr>
+<td><b>Total</b></td>
+<td><b>${totalF}</b></td>
+<td>-</td>
+<td><b>${totalFX}</b></td>
+<td><b>${totalFX2}</b></td>
+</tr>
+</table>
+`;
+
+document.getElementById("tableOutput").innerHTML=table;
+
+let mean=totalFX/totalF;
+
+let variance=
+(totalFX2/totalF)-
+(mean*mean);
+
+let failed=
+scores.filter(
+x=>x<passMark
+).length;
+
+let probability=
+failed/scores.length;
+
+document.getElementById("results").innerHTML=`
+<p><b>Mean:</b> ${mean.toFixed(2)}</p>
+<p><b>Variance:</b> ${variance.toFixed(2)}</p>
+<p><b>Failed Students:</b> ${failed}</p>
+<p><b>Probability of Failure:</b> ${probability.toFixed(2)}</p>
+<p><b>Failure Percentage:</b> ${(probability*100).toFixed(2)}%</p>
+`;
+}
+</script>
 
 </body>
 </html>
